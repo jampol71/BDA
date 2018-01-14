@@ -1,0 +1,208 @@
+
+/*TABLAS EXTERNAS DE RAW*/
+
+
+CREATE EXTERNAL TABLE IF NOT EXISTS ODS_RAW_CLIENTES7 ( 
+id_cliente int, 
+nombre_cliente string, 
+apellidos_cliente string, 
+numdoc_cliente string, 
+id_sexo bigint, 
+id_direccion_cliente bigint, 
+telefono_cliente bigint, 
+email string, 
+fc_nacimiento string, 
+id_profesion bigint, 
+id_companya bigint, 
+fc_insert string, 
+fc_modificacion string 
+) 
+ROW FORMAT DELIMITED 
+FIELDS TERMINATED BY "," 
+STORED AS TEXTFILE 
+LOCATION '/HIVE/ODS_RAW_CLIENTES7';
+
+
+
+LOAD DATA INPATH '/user/hive/ODS_RAW_CLIENTES7' INTO TABLE ods_raw_clientes7;
+
+
+DROP TABLE ods_raw_clientes7;
+
+
+
+
+CREATE EXTERNAL TABLE IF NOT EXISTS ODS_RAW_FACTURAS8 ( 
+id_factura bigint, 
+id_cliente bigint, 
+fc_inicio string,
+fc_fin string,
+fc_estado string,
+fc_pago string,
+id_ciclo_facturacion bigint,
+id_metodo_pago bigint,
+cantidad int,
+fc_insert string,
+fc_modificacion string 
+) 
+ROW FORMAT DELIMITED 
+FIELDS TERMINATED BY "," 
+STORED AS TEXTFILE
+LOCATION '/ROOT/ODS_RAW_FACTURAS8'
+
+
+
+LOAD DATA INPATH '/user/root/ODS_RAW_FACTURAS8' INTO TABLE ods_raw_facturas8;
+
+
+
+CREATE EXTERNAL TABLE IF NOT EXISTS ODS_RAW_SERVICIOS7 ( 
+id_servicio bigint,
+id_cliente int,
+id_producto int,
+punto_acceso string,
+id_canal int,
+id_agente int,
+id_direccion_servicio string,
+fc_inicio string,
+fc_instalacion string,
+fc_fin string,
+fc_insert string,
+fc_modificacion string
+) 
+ROW FORMAT DELIMITED 
+FIELDS TERMINATED BY "," 
+STORED AS TEXTFILE
+LOCATION '/ROOT/ODS_RAW_SERVICIOS7';
+
+
+LOAD DATA INPATH '/user/root/ODS_RAW_SERVICIOS7' INTO TABLE ods_raw_servicios7;
+
+
+
+
+
+CREATE EXTERNAL TABLE IF NOT EXISTS ODS_RAW_DIRECCIONES7 ( 
+id_direccion bigint,
+de_cp int,
+de_direccion string,
+id_ciudad_estado bigint,
+fc_insert string,
+fc_modificacion string
+) 
+ROW FORMAT DELIMITED 
+FIELDS TERMINATED BY "," 
+STORED AS TEXTFILE
+LOCATION '/ROOT/ODS_RAW_DIRECCIONES7';
+
+LOAD DATA INPATH '/user/root/ODS_RAW_DIRECCIONES7' INTO TABLE ods_raw_direcciones7;
+
+
+
+
+CREATE EXTERNAL TABLE IF NOT EXISTS ODS_RAW_CIUDADES_ESTADOS ( 
+id_ciudad_estado bigint,
+de_ciudad string,
+de_estado string,
+id_pais bigint,
+fc_insert string,
+fc_modificacion string
+) 
+ROW FORMAT DELIMITED 
+FIELDS TERMINATED BY "," 
+STORED AS TEXTFILE
+LOCATION '/ROOT/ODS_RAW_CIUDADES_ESTADOS';
+
+LOAD DATA INPATH '/user/root/ODS_RAW_CIUDADES_ESTADOS' INTO TABLE ods_raw_ciudades_estados;
+
+
+
+
+/* TABLAS FINALES */
+
+
+/* TABLA GENERAL PRIMER PERIODO */
+CREATE TABLE general_primer_periodo AS
+select fact.id_cliente
+,fact.cantidad
+,fact.id_metodo_pago
+,cli.id_sexo
+,cli.fc_nacimiento
+FROM ods_raw_facturas8 fact
+JOIN ods_raw_clientes7 cli ON (cli.id_cliente=fact.id_cliente)
+WHERE unix_timestamp(fact.fc_pago,'yyy-MM-dd') >= unix_timestamp('2016-01-01','yyyy-MM-dd') 
+AND unix_timestamp(fact.fc_pago,'yyy-MM-dd') <= unix_timestamp('2016-05-01','yyyy-MM-dd');
+
+
+
+/* TABLA GENERAL SEGUNDO PERIODO  */
+
+CREATE TABLE general_segundo_periodo AS
+select cli.id_cliente
+,fact.cantidad
+,fact.id_metodo_pago
+,cli.id_sexo
+,cli.fc_nacimiento
+FROM ods_raw_facturas8 fact
+JOIN ods_raw_clientes7 cli ON (cli.id_cliente=fact.id_cliente)
+WHERE unix_timestamp(fact.fc_pago,'yyy-MM-dd') >= unix_timestamp('2016-05-01','yyyy-MM-dd') 
+AND unix_timestamp(fact.fc_pago,'yyy-MM-dd') <= unix_timestamp('2016-09-01','yyyy-MM-dd');
+
+
+/* TABLA GENERAL TERCER PERIODO  */
+
+CREATE TABLE general_tercer_periodo AS
+select cli.id_cliente
+,fact.cantidad
+,fact.id_metodo_pago
+,cli.id_sexo
+,cli.fc_nacimiento
+FROM ods_raw_facturas8 fact
+JOIN ods_raw_clientes7 cli ON (cli.id_cliente=fact.id_cliente)
+WHERE unix_timestamp(fact.fc_pago,'yyy-MM-dd') >= unix_timestamp('2016-09-01','yyyy-MM-dd') 
+AND unix_timestamp(fact.fc_pago,'yyy-MM-dd') <= unix_timestamp('2017-01-01','yyyy-MM-dd');
+
+
+
+/* TABLA GENERAL CUARTO PERIODO  */
+
+CREATE TABLE general_cuarto_periodo AS
+select cli.id_cliente
+,fact.cantidad
+,fact.id_metodo_pago
+,cli.id_sexo
+,cli.fc_nacimiento
+FROM ods_raw_facturas8 fact
+JOIN ods_raw_clientes7 cli ON (cli.id_cliente=fact.id_cliente)
+WHERE unix_timestamp(fact.fc_pago,'yyy-MM-dd') >= unix_timestamp('2017-01-01','yyyy-MM-dd') 
+AND unix_timestamp(fact.fc_pago,'yyy-MM-dd') <= unix_timestamp('2017-05-01','yyyy-MM-dd');
+
+
+
+/* TABLA GENERAL QUINTO PERIODO */
+
+CREATE TABLE general_quinto_periodo AS
+select cli.id_cliente
+,fact.cantidad
+,fact.id_metodo_pago
+,cli.id_sexo
+,cli.fc_nacimiento
+FROM ods_raw_facturas8 fact
+JOIN ods_raw_clientes7 cli ON (cli.id_cliente=fact.id_cliente)
+WHERE unix_timestamp(fact.fc_pago,'yyy-MM-dd') >= unix_timestamp('2017-05-01','yyyy-MM-dd') 
+AND unix_timestamp(fact.fc_pago,'yyy-MM-dd') <= unix_timestamp('2017-09-01','yyyy-MM-dd');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
