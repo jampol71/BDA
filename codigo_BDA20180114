@@ -2,6 +2,9 @@
 /*TABLAS EXTERNAS DE RAW*/
 
 
+/* CREACION TABLA ODS_RAW_CLIENTES VERSION 7 */
+
+
 CREATE EXTERNAL TABLE IF NOT EXISTS ODS_RAW_CLIENTES7 ( 
 id_cliente int, 
 nombre_cliente string, 
@@ -30,6 +33,9 @@ LOAD DATA INPATH '/user/hive/ODS_RAW_CLIENTES7' INTO TABLE ods_raw_clientes7;
 DROP TABLE ods_raw_clientes7;
 
 
+/* CREACION TABLA ODS_RAW_FACTURAS VERSION 8 */
+
+
 
 
 CREATE EXTERNAL TABLE IF NOT EXISTS ODS_RAW_FACTURAS8 ( 
@@ -53,6 +59,10 @@ LOCATION '/ROOT/ODS_RAW_FACTURAS8'
 
 
 LOAD DATA INPATH '/user/root/ODS_RAW_FACTURAS8' INTO TABLE ods_raw_facturas8;
+
+
+
+/* CREACION TABLA ODS_RAW_SERVICIOS VERSION 7 */
 
 
 
@@ -81,6 +91,9 @@ LOAD DATA INPATH '/user/root/ODS_RAW_SERVICIOS7' INTO TABLE ods_raw_servicios7;
 
 
 
+/* CREACION TABLA ODS_RAW_DIRECCIONES VERSION 7 */
+
+
 
 CREATE EXTERNAL TABLE IF NOT EXISTS ODS_RAW_DIRECCIONES7 ( 
 id_direccion bigint,
@@ -97,6 +110,9 @@ LOCATION '/ROOT/ODS_RAW_DIRECCIONES7';
 
 LOAD DATA INPATH '/user/root/ODS_RAW_DIRECCIONES7' INTO TABLE ods_raw_direcciones7;
 
+
+
+/* CREACION TABLA ODS_RAW_CIUDADES_ESTADOS */
 
 
 
@@ -118,7 +134,7 @@ LOAD DATA INPATH '/user/root/ODS_RAW_CIUDADES_ESTADOS' INTO TABLE ods_raw_ciudad
 
 
 
-/* TABLAS FINALES */
+/* TABLAS FINALES. SON TABLAS GESTIONADAS DE HIVE */
 
 
 /* TABLA GENERAL PRIMER PERIODO */
@@ -191,6 +207,16 @@ FROM ods_raw_facturas8 fact
 JOIN ods_raw_clientes7 cli ON (cli.id_cliente=fact.id_cliente)
 WHERE unix_timestamp(fact.fc_pago,'yyy-MM-dd') >= unix_timestamp('2017-05-01','yyyy-MM-dd') 
 AND unix_timestamp(fact.fc_pago,'yyy-MM-dd') <= unix_timestamp('2017-09-01','yyyy-MM-dd');
+
+
+
+
+/* ESTADOS COMUNES */
+
+select distinct est.de_estado
+from ods_raw_ciudades_estados as est
+join dimension_estados5 as dimension on (dimension._c1 = est.de_estado);
+
 
 
 
